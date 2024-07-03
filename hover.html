@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <style>
+        body
+        {   
+            display:flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .style1
+        {  
+
+            width: 200px;
+            height: 400px;
+            background-color: gray;
+           
+        }
+        .style1::before
+        {
+            content: "";
+            position: absolute;
+            background-color: red;
+            z-index: -1;
+            border-radius: 15px;
+            width: 200px;
+            height: 400px;
+        }
+        .style1:hover::before
+        {   
+            width: 210px;
+            height:410px;
+        }
+        
+    </style>
+    <div class="style1">
+        <span></span>
+    </div>
+</body>
+</html>

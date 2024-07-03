@@ -1,0 +1,17 @@
+:root
+{   --tsb-color:0 1px 0 blue,
+    0 2px 0 blue,
+    0 3px 0 blue,
+    0 4px 0 blue,
+    0 5px 0 blue,
+    0 6px 0 transparent,
+    0 7px 0 transparent,
+    0 8px 0 transparent,
+    0 9px 0 transparent,
+    0 10px 10px rgba(0, 0, 0,0.6);
+    --pl-color:blue;
+    --text-color-b:white;
+    --bg-color:blue;
+    --ts-color: 0 0 5px #fff,0 0 10px #fff,0 0 20px blue,0 0 2px blue,0 0 5px blue,0 0 8px blue,0 0 10px blue,0 0 15px blue;
+    --tsh-color:0 0 15px #fff,0 0 20px #fff,0 0 30px blue,0 0 40px blue,0 0 40px blue,0 0 50px blue,0 0 60px blue,0 0 70px blue;
+}
