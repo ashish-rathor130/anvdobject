@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container{
+            display:flex;
+            justify-content:space-around;
+        }
+        .video-style{
+            border:5px solid green;
+            border-radius:20px;
+            max-width:400px;
+            height:fit-content;
+        }
+        #canvas{
+            border:5px solid blue;
+            border-radius:20px;
+            max-width:400px;
+            height:fit-content;
+        }
+        h1{
+            text-align:center;
+        }
+        #snap{
+            color:white;
+            background:green;
+            padding:15px;
+            font-weight:bold;
+            font-size:30px;
+            border-radius:10px;
+            border:2px solid green;
+        }
+        #snap:hover{
+            opacity:80%;
+        }
+        #snap:active{
+            opacity: 90%;
+        }
+    </style>
+</head>
+<body >
+    <h1>Capture Image from Webcam</h1>
+    <div class="container">
+    <div>
+        <video id="video" width="640" height="480" autoplay class="video-style" ></video>
+    </div>
+    <button id="snap">Capture</button>
+    <div>
+        <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+</div>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const context = canvas.getContext('2d');
+const snap = document.getElementById('snap');
+
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+        video.srcObject = stream;
+    });
+
+snap.addEventListener('click', function() {
+    context.drawImage(video, 0, 0, 640, 480);
+    const dataURL = canvas.toDataURL('image/png');
+});
+</script>
+
+</body>
+</html>
