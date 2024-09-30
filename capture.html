@@ -3,72 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Object Detection</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
     <style>
-        .container{
-            display:flex;
-            justify-content:space-around;
+        body{
+            padding: 0;
+            margin: 0;
         }
-        .video-style{
-            border:5px solid green;
-            border-radius:20px;
-            max-width:400px;
-            height:fit-content;
+        #video,#photo{
+            max-width: 100%;
+            border:2px solid blue ;
+            border-radius: 20px;
+            height: auto;
         }
-        #canvas{
-            border:5px solid blue;
-            border-radius:20px;
-            max-width:400px;
-            height:fit-content;
+        .video-container{
+            position: relative;
+            text-align: center;
         }
-        h1{
-            text-align:center;
+        #overlay {
+            max-width:100%;
+            position: absolute;
+            float: center;
+            top: 20px;
+            right: 20%;
+            border-radius: 20px;
         }
-        #snap{
-            color:white;
-            background:green;
-            padding:15px;
-            font-weight:bold;
-            font-size:30px;
-            border-radius:10px;
-            border:2px solid green;
-        }
-        #snap:hover{
-            opacity:80%;
-        }
-        #snap:active{
-            opacity: 90%;
+        @media screen and (max-width:992px) {
+            #overlay{
+                right: 0;
+                top: 10px;
+            }
         }
     </style>
 </head>
-<body >
-    <h1>Capture Image from Webcam</h1>
+<body>
+    <div class="progress" id="processing">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%">Loading model...</div>
+    </div>
+    <div class="container text-center">
+        <div >Loading model...</div>
+        <div class="video-container" width="720" height="560">
+            <video id="video" width="720" height="560" autoplay muted></video>
+            <canvas id="overlay" width="720" height="560"></canvas>
+        </div>
+        <button class="btn btn-outline-primary" id="captureButton">Capture Image</button><br><br>   
+        <img id="photo" alt="Captured Image"><br>
+        <a class="btn btn-outline-primary" href="">Recapture</a> 
+    </div>
     <div class="container">
-    <div>
-        <video id="video" width="640" height="480" autoplay class="video-style" ></video>
+        <div class="badge bg-primary position-absolute bottom-0 right-0">By Ashish</div>
     </div>
-    <button id="snap">Capture</button>
-    <div>
-        <canvas id="canvas" width="640" height="480"></canvas>
-    </div>
-</div>
+    <script>
+        const video = document.getElementById('video');
+        const overlay = document.getElementById('overlay');
+        const captureButton = document.getElementById('captureButton');
+        const photo = document.getElementById('photo');
+        const context = overlay.getContext('2d');
+        const processing = document.getElementById('processing');
+        
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+            video.srcObject = stream;
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    resolve(video);
+                };
+            });
+        }
 
-<script>
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-const context = canvas.getContext('2d');
-const snap = document.getElementById('snap');
+        async function loadModel() {
+            processing.style.display = 'block';
+            const model = await cocoSsd.load();
+            processing.style.display = 'none';
+            return model;
+        }
 
-navigator.mediaDevices.getUserMedia({ video: true })
-    .then(function(stream) {
-        video.srcObject = stream;
-    });
+        async function detectObjects(model) {
+            const predictions = await model.detect(video);
+            context.clearRect(0, 0, overlay.width, overlay.height);
+            predictions.forEach(prediction => {
+                context.beginPath();
+                context.rect(...prediction.bbox);
+                context.lineWidth = 4;
+                context.strokeStyle = 'green';
+                context.fillStyle = 'white';
+                context.stroke();
+                h2 = context.fillText(
+                    `${prediction.class} (${Math.round(prediction.score * 100)}%)`,
+                    prediction.bbox[0],
+                    prediction.bbox[1] > 10 ? prediction.bbox[1] - 5 : 10,
+                );
+            });
+        }
 
-snap.addEventListener('click', function() {
-    context.drawImage(video, 0, 0, 640, 480);
-    const dataURL = canvas.toDataURL('image/png');
-});
-</script>
+        async function start() {
+            await setupCamera();
+            const model = await loadModel();
+            video.play();
+            setInterval(() => detectObjects(model), 100);
+        }
 
+        captureButton.addEventListener('click', () => {
+            context.drawImage(video, 0, 0, overlay.width, overlay.height);
+            const dataURL = overlay.toDataURL('image/png');
+            photo.src = dataURL;
+
+            // Stop all video tracks
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+        });
+
+        start();
+    </script>
 </body>
 </html>
