@@ -529,7 +529,7 @@
             z-index: 10;
             border-radius: 5px;
             transition: all .3s ease;
-            transform: translateX(-200px);
+            transform: translateX(-250px);
             background-color: white;
         }
         .color-changer.open
